@@ -1,0 +1,3 @@
+[submodule "terraform-vultr-condor"]
+	path = terraform-vultr-condor
+	url = https://github.com/nightshift2k/terraform-vultr-condor
