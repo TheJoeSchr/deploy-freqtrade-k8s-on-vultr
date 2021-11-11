@@ -1,0 +1,7 @@
+import:
+  - _global_deployment
+  - _global_dbsync_s3
+  - _global_git_strategies
+  - _global_dry_run
+  - _global_ftapi
+  - _global_telegram_chatid

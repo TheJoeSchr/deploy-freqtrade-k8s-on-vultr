@@ -1,0 +1,25 @@
+import:
+  - _global
+  - _exchange_binance_proxied
+  - _whitelist_binance_busd_drafty
+  - _blacklist_binance
+  - _pairlist_static
+  - _telegram_token_bot02
+
+deployment_name: bot-highfrog-v18-busd-static-drafty
+deployment_enabled: true
+
+strategy: "high_frog_v18"
+
+configuration:
+  stake_currency: BUSD
+  max_open_trades: 3
+  dry_run_wallet: 3000
+  stake_amount: 1000
+  bid_strategy:
+    price_side: "ask"
+    use_order_book: false
+  ask_strategy:
+    price_side: "bid"
+    use_order_book: false
+    ignore_buying_expired_candle_after: 120
