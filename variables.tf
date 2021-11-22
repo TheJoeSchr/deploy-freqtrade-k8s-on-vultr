@@ -1,12 +1,18 @@
-variable "k0s_api_host" {
-  description = "Host IP?"
+variable "ssh_key_path" {
+  description = "Path to ssh key used to connect to nodes"
   type        = string
 }
 
-variable "k0s_api_config_path" {
-  description = "k0sctl/kubeconfig for controller "
+variable "deployment_vultr_api_key" {
+  description = "Vultr API Key for the Terraform deployment"
   type        = string
-  default     = "admin-default.conf"
+  sensitive   = true
+}
+
+variable "cluster_vultr_api_key" {
+  description = "Vultr API Key for the Terraform deployment (deploy cluster)"
+  type        = string
+  sensitive   = true
 }
 
 variable "bot_namespace" {

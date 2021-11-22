@@ -1,15 +1,3 @@
-provider "kubernetes" {
-  config_path = var.k0s_api_config_path
-  insecure    = true
-}
-
-provider "helm" {
-  kubernetes {
-    config_path = var.k0s_api_config_path
-    insecure    = true
-  }
-}
-
 locals {
   bot_configs = fileset("./config", "bot*.yaml")
 }
@@ -30,10 +18,38 @@ locals {
   bot_final_configs = {
     for k, v in module.yaml_config : try(v.map_configs["deployment_name"], split(".", k)[0]) => v.map_configs if try(v.map_configs["deployment_enabled"], true) != false
   }
+  worker_count = length(local.bot_final_configs)
 }
 
-output "bot_final_configs" {
-  value = local.bot_final_configs
+data "local_file" "ssh_key" {
+  filename = var.ssh_key_path
+}
+
+module "condor" {
+  source                            = "./terraform-vultr-condor"
+  cluster_name                      = var.bot_namespace
+  deployment_vultr_api_key          = var.deployment_vultr_api_key
+  cluster_vultr_api_key             = var.deployment_vultr_api_key
+  worker_count                      = local.worker_count
+  region                            = "nrt"
+  cluster_os                        = "Debian 10 x64 (buster)"
+  worker_plan                       = "vc2-1c-1gb"
+  controller_plan                   = "vc2-1c-1gb"
+  cluster_append_random_id          = false
+  cluster_external_dns_domain       = "a-domain-that-exists-in-your-vultr-account.xyz"
+  cluster_create_external_dns_hosts = false
+  enable_vultr_csi                  = false
+  # disable components (valid items: konnectivity-server,kube-scheduler,kube-controller-manager,control-api,csr-approver,default-psp,kube-proxy,coredns,network-provider,helm,metrics-server,kubelet-config,system-rbac)
+  k0s_disable_components = [
+    "metrics-server"
+  ]
+  control_plane_firewall_rules = [
+    {
+      port    = 6443
+      ip_type = "v4"
+      source  = "0.0.0.0/0"
+    }
+  ]
 }
 
 resource "kubernetes_namespace" "bots" {
@@ -42,24 +58,31 @@ resource "kubernetes_namespace" "bots" {
   }
 }
 
-resource "helm_release" "binance_proxy" {
-  name              = "binance-proxy"
-  namespace         = kubernetes_namespace.bots.id
-  repository        = "https://nightshift2k.github.io/helm-charts"
-  chart             = "binance-proxy"
-  wait              = true
-  dependency_update = true
+locals {
+  k0s_api_config_path = module.condor.kubeconfig
+}
+provider "kubernetes" {
+  config_path = local.k0s_api_config_path
+  insecure    = true
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = local.k0s_api_config_path
+    insecure    = true
+  }
 }
 
 resource "helm_release" "bots" {
   for_each = local.bot_final_configs
   name     = tostring(each.key)
   depends_on = [
-    helm_release.binance_proxy
+    module.condor
   ]
   namespace         = kubernetes_namespace.bots.id
-  repository        = "https://nightshift2k.github.io/helm-charts"
-  chart             = "freqtrade"
+  /* repository        = "https://nightshift2k.github.io/helm-charts" */
+  /* chart             = "freqtrade" */
+  chart             = "./helm-charts/charts/freqtrade"
   wait              = true
   dependency_update = true
   values            = [yamlencode(each.value)]
