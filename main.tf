@@ -33,7 +33,7 @@ module "condor" {
   worker_count                      = local.worker_count
   region                            = "nrt"
   cluster_os                        = "Debian 10 x64 (buster)"
-  worker_plan                       = "vc2-1c-1gb"
+  worker_plan                       = "vhf-1c-1gb"
   controller_plan                   = "vc2-1c-1gb"
   cluster_append_random_id          = false
   cluster_external_dns_domain       = "a-domain-that-exists-in-your-vultr-account.xyz"
