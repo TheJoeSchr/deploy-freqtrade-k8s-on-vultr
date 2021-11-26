@@ -1,0 +1,20 @@
+---
+servers:
+  -
+    name        : "9fe9058c_554c_4da9_8fd5_b4678f6aafa3"
+    username    : "ftapi"
+    password    : "PasswordSecret"
+    ip          : 45.76.195.125
+    port        : 30000
+  -
+    name        : "b02e8221_bbfa_4db7_ae17_e2fa8671be78"
+    username    : "ftapi"
+    password    : "PasswordSecret"
+    ip          : 207.148.100.112
+    port        : 30000
+  -
+    name        : "ff207559_e045_4718_9d02_4d52535e0e9b"
+    username    : "ftapi"
+    password    : "PasswordSecret"
+    ip          : 108.160.134.35
+    port        : 30000

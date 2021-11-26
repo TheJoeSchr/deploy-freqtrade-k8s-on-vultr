@@ -87,3 +87,23 @@ resource "helm_release" "bots" {
   dependency_update = true
   values            = [yamlencode(each.value)]
 }
+
+# generate frogtrade-9000 config yaml
+resource "local_file" "ft9000-config" {
+  content = templatefile("${path.module}/templates/ft9000-servers.tpl",
+  {
+    instances = zipmap(
+        flatten(tolist(
+            module.condor.worker_ids,
+        )),
+        flatten(tolist(
+            module.condor.worker_ips,
+        )),
+    )
+    username = "ftapi"
+    password = "PasswordSecret"
+    port = "30000"
+  })
+  filename = "${abspath(path.root)}/output/ft9000-servers.yaml"
+  file_permission = "0600"
+}
