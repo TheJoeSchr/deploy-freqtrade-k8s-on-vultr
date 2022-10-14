@@ -48,6 +48,11 @@ module "condor" {
       port    = 6443
       ip_type = "v4"
       source  = "0.0.0.0/0"
+    },
+    {
+      port    = 80
+      ip_type = "v4"
+      source  = "0.0.0.0/0"
     }
   ]
 }
