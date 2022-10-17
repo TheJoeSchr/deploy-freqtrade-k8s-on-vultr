@@ -98,9 +98,7 @@ resource "local_file" "ft9000-config" {
   content = templatefile("${path.module}/templates/ft9000-servers.tpl",
   {
     instances = zipmap(
-        flatten(tolist(
-            module.condor.worker_ids,
-        )),
+        flatten([ for o in helm_release.bots : o.name ]),
         flatten(tolist(
             module.condor.worker_ips,
         )),
