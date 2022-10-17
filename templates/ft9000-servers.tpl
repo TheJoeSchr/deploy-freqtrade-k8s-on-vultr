@@ -3,8 +3,8 @@ servers:
 %{ for name, ip in instances ~}
   -
     name        : "${replace(name, "-","_")}"
-    username    : "${username}"
-    password    : "${password}"
+    username    : "${usernames[name]}"
+    password    : "${passwords[name]}"
     ip          : ${ip}
     port        : ${port}
 %{ endfor ~}

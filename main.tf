@@ -105,8 +105,14 @@ resource "local_file" "ft9000-config" {
             module.condor.worker_ips,
         )),
     )
-    username = "ftapi"
-    password = "PasswordSecret"
+    usernames = zipmap(
+        flatten([ for o in helm_release.bots : o.name ]),
+        flatten([ for o in helm_release.bots : local.bot_final_configs[o.name].auth.api.username] )
+    )
+    passwords = zipmap(
+        flatten([ for o in helm_release.bots : o.name ]),
+        flatten([ for o in helm_release.bots : local.bot_final_configs[o.name].auth.api.password] )
+    )
     port = "30000"
   })
   filename = "${abspath(path.root)}/output/ft9000-servers.yaml"
