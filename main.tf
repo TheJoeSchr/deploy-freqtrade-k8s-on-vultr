@@ -93,6 +93,10 @@ resource "helm_release" "bots" {
   values            = [yamlencode(each.value)]
 }
 
+locals {
+  auth  = yamldecode(file("${path.module}/config/_global_ftapi.yaml"))["auth"]
+}
+
 # generate frogtrade-9000 config yaml
 resource "local_file" "ft9000-config" {
   content = templatefile("${path.module}/templates/ft9000-servers.tpl",
